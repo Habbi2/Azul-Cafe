@@ -1,22 +1,25 @@
 {
   "name": "azul-cafe",
   "version": "1.0.0",
-  "description": "Menu web app for Azul Café with admin panel",
+  "description": "Menu web app for Azul Café with admin panel using Firebase",
   "main": "index.html",
   "scripts": {
-    "dev": "vercel dev",
-    "deploy": "vercel deploy --prod"
+    "setup": "node setup-firebase.js",
+    "import-data": "node import-initial-data.js",
+    "deploy": "firebase deploy"
   },
   "keywords": [
     "cafe",
     "menu",
-    "vercel",
-    "serverless"
+    "firebase",
+    "realtime-database"
   ],
   "author": "Azul Café",
   "license": "MIT",
   "dependencies": {
+    "firebase-admin": "^11.8.0"
   },
   "devDependencies": {
+    "firebase-tools": "^12.4.0"
   }
 }

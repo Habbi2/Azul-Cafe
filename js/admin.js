@@ -1,4 +1,4 @@
-// Admin panel JavaScript
+// Admin panel JavaScript with Firebase integration
 document.addEventListener('DOMContentLoaded', function() {
     // DOM Elements
     const loginForm = document.getElementById('login-form');
@@ -12,10 +12,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveChangesBtn = document.getElementById('save-changes-btn');
     const logoutBtn = document.getElementById('logout-btn');
     
-    // Check if already logged in
-    if (localStorage.getItem('azulCafeAdmin') === 'true') {
-        showAdminPanel();
-    }
+    // Set up anonymous auth for admin authentication
+    // This is a simple approach - for production, you should use more robust authentication
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            // User is signed in
+            showAdminPanel();
+        } else {
+            // No user is signed in
+            loginSection.classList.remove('hidden');
+            adminPanel.classList.add('hidden');
+        }
+    });
     
     // Event Listeners
     loginForm.addEventListener('submit', handleLogin);
@@ -24,31 +32,20 @@ document.addEventListener('DOMContentLoaded', function() {
     newItemForm.addEventListener('submit', handleNewItem);
     saveChangesBtn.addEventListener('click', saveChanges);
     logoutBtn.addEventListener('click', logout);
-    
-    // Load menu data for editing
-    loadMenuForEditing();
-    
-    // Functions
+      // Functions
     async function handleLogin(e) {
         e.preventDefault();
         const password = document.getElementById('password').value;
         
+        // For this simple application, we're using a hardcoded admin password
+        // In production, you'd use Firebase Authentication with proper security
+        const ADMIN_PASSWORD = 'admin123'; // Change this to your desired password
+        
         try {
-            // Call the authentication API
-            const response = await fetch('/api/auth.js', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ password })
-            });
-            
-            const data = await response.json();
-            
-            if (response.ok && data.success) {
-                // Store the API key for later use
-                localStorage.setItem('azulCafeAdmin', 'true');
-                localStorage.setItem('azulCafeApiKey', data.apiKey);
+            if (password === ADMIN_PASSWORD) {
+                // Sign in anonymously with Firebase
+                // In a production app, you'd use email/password or another authentication method
+                await firebase.auth().signInAnonymously();
                 showAdminPanel();
             } else {
                 alert('Contraseña incorrecta');
@@ -58,23 +55,48 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Error al iniciar sesión. Por favor, inténtelo de nuevo.');
         }
     }
-    
-    function showAdminPanel() {
+      function showAdminPanel() {
         loginSection.classList.add('hidden');
         adminPanel.classList.remove('hidden');
         loadMenuForEditing();
     }
     
-    async function loadMenuForEditing() {
+    function loadMenuForEditing() {
         try {
-            // Use the serverless function to get the menu data
-            const response = await fetch('/api/get-menu.js');
-            if (!response.ok) {
-                throw new Error('No se pudo cargar el menú');
-            }
+            // Show loading indicator
+            menuEditor.innerHTML = '<div class="loading">Cargando menú...</div>';
             
-            const data = await response.json();
-            renderMenuEditor(data);
+            // Listen for data from Firebase
+            menuRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    renderMenuEditor(data);
+                } else {
+                    // If no menu data exists yet, initialize with empty structure
+                    const emptyMenu = {
+                        categorias: [
+                            {
+                                id: "sin-leche",
+                                nombre: "Sin Leche",
+                                items: []
+                            },
+                            {
+                                id: "con-leche",
+                                nombre: "Con Leche",
+                                items: []
+                            }
+                        ]
+                    };
+                    renderMenuEditor(emptyMenu);
+                }
+            }, (error) => {
+                console.error('Error loading menu data from Firebase:', error);
+                menuEditor.innerHTML = `
+                    <div class="error-message">
+                        <p>No se pudo cargar el menú para editar. Por favor, inténtelo de nuevo.</p>
+                    </div>
+                `;
+            });
         } catch (error) {
             console.error('Error al cargar el menú:', error);
             menuEditor.innerHTML = `
@@ -228,35 +250,21 @@ document.addEventListener('DOMContentLoaded', function() {
             renderMenuEditor(window.menuData);
         }
     }
-    
-    async function saveChanges() {
+      async function saveChanges() {
         try {
-            // Get the API key from local storage
-            const apiKey = localStorage.getItem('azulCafeApiKey');
+            // Check if user is authenticated
+            const user = firebase.auth().currentUser;
             
-            if (!apiKey) {
+            if (!user) {
                 throw new Error('No tiene permiso para realizar esta acción. Por favor, inicie sesión de nuevo.');
             }
             
-            // Send the updated menu data to the serverless function
-            const response = await fetch('/api/update-menu.js', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify(window.menuData)
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al guardar los cambios');
-            }
+            // Save the updated menu data to Firebase
+            await menuRef.set(window.menuData);
             
             alert('Cambios guardados correctamente');
             
-            // Reload the menu to show the updated data
-            loadMenuForEditing();
+            // No need to reload, Firebase will trigger the value listener
         } catch (error) {
             console.error('Error al guardar los cambios:', error);
             alert(`Error al guardar los cambios: ${error.message}`);
@@ -269,10 +277,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function logout() {
-        localStorage.removeItem('azulCafeAdmin');
-        localStorage.removeItem('azulCafeApiKey');
-        loginSection.classList.remove('hidden');
-        adminPanel.classList.add('hidden');
-        document.getElementById('password').value = '';
+        // Sign out of Firebase
+        firebase.auth().signOut().then(() => {
+            // Sign-out successful
+            loginSection.classList.remove('hidden');
+            adminPanel.classList.add('hidden');
+            document.getElementById('password').value = '';
+        }).catch((error) => {
+            // An error happened
+            console.error('Error during logout:', error);
+        });
     }
 });

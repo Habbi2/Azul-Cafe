@@ -1,19 +1,38 @@
 // Main JavaScript for menu display
 document.addEventListener('DOMContentLoaded', function() {
-    // Fetch and display menu
+    // Fetch and display menu from Firebase
     fetchMenu();
 });
 
-async function fetchMenu() {
+// Function to fetch menu data from Firebase
+function fetchMenu() {
     try {
-        // Use the serverless function to get the menu data
-        const response = await fetch('/api/get-menu.js');
-        if (!response.ok) {
-            throw new Error('No se pudo cargar el menú');
-        }
+        // Show loading state
+        document.getElementById('menu-container').innerHTML = `
+            <div class="loading">Cargando menú...</div>
+        `;
         
-        const data = await response.json();
-        renderMenu(data);
+        // Listen to menu data from Firebase
+        menuRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                renderMenu(data);
+            } else {
+                // If no data in Firebase, render empty state
+                document.getElementById('menu-container').innerHTML = `
+                    <div class="error-message">
+                        <p>No hay datos de menú disponibles. Por favor, contacte al administrador.</p>
+                    </div>
+                `;
+            }
+        }, (error) => {
+            console.error('Error reading menu data from Firebase:', error);
+            document.getElementById('menu-container').innerHTML = `
+                <div class="error-message">
+                    <p>Lo sentimos, no se pudo cargar el menú. Por favor, inténtelo de nuevo más tarde.</p>
+                </div>
+            `;
+        });
     } catch (error) {
         console.error('Error al cargar el menú:', error);
         document.getElementById('menu-container').innerHTML = `
