@@ -1,0 +1,22 @@
+{
+  "name": "azul-cafe",
+  "version": "1.0.0",
+  "description": "Menu web app for Azul Café with admin panel",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel deploy --prod"
+  },
+  "keywords": [
+    "cafe",
+    "menu",
+    "vercel",
+    "serverless"
+  ],
+  "author": "Azul Café",
+  "license": "MIT",
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}
