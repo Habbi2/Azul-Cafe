@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             // First verify the password with our Vercel serverless function
-            const response = await fetch('/api/auth-admin', {
+            const response = await fetch('/api/auth-admin.js', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
