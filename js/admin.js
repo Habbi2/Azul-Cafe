@@ -32,20 +32,27 @@ document.addEventListener('DOMContentLoaded', function() {
     newItemForm.addEventListener('submit', handleNewItem);
     saveChangesBtn.addEventListener('click', saveChanges);
     logoutBtn.addEventListener('click', logout);
-      // Functions
+    // Functions    
     async function handleLogin(e) {
         e.preventDefault();
+        const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         
-        // For this simple application, we're using a hardcoded admin password
-        // In production, you'd use Firebase Authentication with proper security
-        const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD; // Change this to your desired password
-        
         try {
-            if (password === ADMIN_PASSWORD) {
-                // Sign in anonymously with Firebase
-                // In a production app, you'd use email/password or another authentication method
-                await firebase.auth().signInAnonymously();
+            // First verify the password with our Vercel serverless function
+            const response = await fetch('/api/auth-admin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ password }),
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Password verified, now sign in to Firebase
+                await firebase.auth().signInWithEmailAndPassword(email, password);
                 showAdminPanel();
             } else {
                 alert('Contraseña incorrecta');
@@ -55,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Error al iniciar sesión. Por favor, inténtelo de nuevo.');
         }
     }
-      function showAdminPanel() {
+    function showAdminPanel() {
         loginSection.classList.add('hidden');
         adminPanel.classList.remove('hidden');
         loadMenuForEditing();
