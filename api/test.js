@@ -36,7 +36,7 @@ export default async function handler(req, res) {
 
 async function testGetMenuEndpoint() {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/get-menu`);
+    const response = await fetch(`${API_BASE_URL}/api/get-menu.js`);
     const data = await response.json();
     console.log('Get menu endpoint response:', data);
     return data;
@@ -48,7 +48,7 @@ async function testGetMenuEndpoint() {
 
 async function testAuthEndpoint(password = 'admin123') {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/auth`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth.js`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -73,7 +73,7 @@ async function testUpdateMenuEndpoint(apiKey, menuData) {
   if (!menuData) {
     // Get current menu data first
     try {
-      const menuResponse = await fetch(`${API_BASE_URL}/api/get-menu`);
+      const menuResponse = await fetch(`${API_BASE_URL}/api/get-menu.js`);
       menuData = await menuResponse.json();
     } catch (error) {
       console.error('Failed to get menu data:', error);
@@ -82,7 +82,7 @@ async function testUpdateMenuEndpoint(apiKey, menuData) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/update-menu`, {
+    const response = await fetch(`${API_BASE_URL}/api/update-menu.js`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -120,7 +120,6 @@ async function runAllTests() {
 // Export functions for Node.js environment
 if (typeof module !== 'undefined') {
   module.exports = {
-    testHealthEndpoint,
     testGetMenuEndpoint,
     testAuthEndpoint,
     testUpdateMenuEndpoint,

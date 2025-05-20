@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             // Call the authentication API
-            const response = await fetch('/api/auth', {
+            const response = await fetch('/api/auth.js', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadMenuForEditing() {
         try {
             // Use the serverless function to get the menu data
-            const response = await fetch('/api/get-menu');
+            const response = await fetch('/api/get-menu.js');
             if (!response.ok) {
                 throw new Error('No se pudo cargar el menú');
             }
