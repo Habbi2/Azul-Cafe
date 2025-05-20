@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // For this simple application, we're using a hardcoded admin password
         // In production, you'd use Firebase Authentication with proper security
-        const ADMIN_PASSWORD = 'admin123'; // Change this to your desired password
+        const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD; // Change this to your desired password
         
         try {
             if (password === ADMIN_PASSWORD) {
