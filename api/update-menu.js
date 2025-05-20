@@ -1,11 +1,11 @@
 // For Vercel serverless functions
-import { updateMenuData } from './db.js';
+const db = require('./db.js');
 
 // Use environment variable if available, fallback to hardcoded value
 // In production, set this via Vercel environment variables
 const API_KEY = process.env.API_KEY || 'azulcafe-admin-123'; 
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -35,9 +35,8 @@ export default async function handler(req, res) {
     if (!menuData || !menuData.categorias) {
       return res.status(400).json({ error: 'Datos de menú inválidos' });
     }
-    
-    // Update the menu data using our database module
-    await updateMenuData(menuData);
+      // Update the menu data using our database module
+    await db.updateMenuData(menuData);
     
     // Return success response
     return res.status(200).json({ 

@@ -118,7 +118,7 @@
         async function testEndpoint() {
             try {
                 const API_BASE_URL = getAPIBaseURL();
-                const response = await fetch(`${API_BASE_URL}/api/test`);
+                const response = await fetch(`${API_BASE_URL}/api/test.js`);
                 
                 if (!response.ok) {
                     throw new Error(`Server returned ${response.status} ${response.statusText}`);
@@ -150,7 +150,7 @@
         async function testGetMenuEndpoint() {
             try {
                 const API_BASE_URL = getAPIBaseURL();
-                const response = await fetch(`${API_BASE_URL}/api/get-menu`);
+                const response = await fetch(`${API_BASE_URL}/api/get-menu.js`);
                 
                 if (!response.ok) {
                     throw new Error(`Server returned ${response.status} ${response.statusText}`);
@@ -170,7 +170,7 @@
                 
                 if (!password) return;
                 
-                const response = await fetch(`${API_BASE_URL}/api/auth`, {
+                const response = await fetch(`${API_BASE_URL}/api/auth.js`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

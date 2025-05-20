@@ -1,6 +1,9 @@
 // Database simulation for Azul Café
 // In a real production environment, this would be replaced with actual database code (MongoDB, Postgres, etc.)
 
+// Set up for compatibility with both CommonJS and ES modules
+const isCommonJS = typeof module !== 'undefined' && module.exports;
+
 // Initial data from the JSON file
 const initialMenuData = {
   "categorias": [
@@ -363,7 +366,7 @@ const MENU_UPDATE_TIMESTAMP_KEY = 'AZUL_CAFE_MENU_UPDATED_AT';
  * 2. If there's data in the environment variable, use that
  * 3. Fall back to the initial default data
  */
-export async function getMenuData() {
+async function getMenuData() {
   // If we already have menu data in memory, use it
   if (menuData) {
     return menuData;
@@ -402,28 +405,26 @@ export async function getMenuData() {
  * Updates the menu data both in memory and attempts to persist it
  * in environment variables (which will work for the current deployment)
  */
-export async function updateMenuData(newMenuData) {
+async function updateMenuData(newMenuData) {
   try {
     // Update in-memory data
     menuData = newMenuData;
     lastUpdateTimestamp = Date.now();
-    
-    // Try to update environment variables (this works only in certain environments)
-    // For Vercel, this will only update the current instance but is useful for testing
+      // In Vercel, we can't modify environment variables at runtime
+    // So here we just keep the data in memory for the current instance
+    // But we log what would have been saved for debugging purposes
     try {
-      if (typeof process.env !== 'undefined') {
-        process.env[MENU_DATA_KEY] = JSON.stringify(newMenuData);
-        process.env[MENU_UPDATE_TIMESTAMP_KEY] = lastUpdateTimestamp.toString();
-      }
+      console.log('Menu data that would be persisted:', JSON.stringify(newMenuData).substring(0, 200) + '...');
+      console.log('Environment variables cannot be updated at runtime in Vercel, data is stored in memory only');
+      
+      // In a production app, you would use Vercel KV, MongoDB, etc. here
     } catch (e) {
-      console.log('Could not update environment variables:', e);
-      // This is expected in some environments, so we don't throw the error
+      console.log('Error logging menu data:', e);
     }
     
     // Log success
     console.log(`Menu data updated at ${new Date(lastUpdateTimestamp).toISOString()}`);
-    
-    return { 
+      return { 
       success: true, 
       timestamp: lastUpdateTimestamp,
       message: 'Menu data updated successfully'
@@ -433,3 +434,9 @@ export async function updateMenuData(newMenuData) {
     throw error;
   }
 }
+
+// Export using CommonJS as this is what Vercel expects
+module.exports = {
+  getMenuData,
+  updateMenuData
+};
