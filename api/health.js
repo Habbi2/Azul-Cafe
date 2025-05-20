@@ -9,11 +9,17 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
-  
-  res.status(200).json({ 
+    res.status(200).json({ 
     status: 'ok',
     message: 'Azul Café API is running',
     version: '1.0.0',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    environment: process.env.VERCEL ? 'vercel' : 'local',
+    nodeEnv: process.env.NODE_ENV,
+    apis: {
+      getMenu: '/api/get-menu',
+      auth: '/api/auth',
+      updateMenu: '/api/update-menu'
+    }
   });
 }
