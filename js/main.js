@@ -13,7 +13,7 @@ function fetchMenu() {
         `;
         
         // Listen to menu data from Firebase
-        menuRef.on('value', (snapshot) => {
+        window.menuRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 renderMenu(data);

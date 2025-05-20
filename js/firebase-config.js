@@ -14,7 +14,8 @@ const firebaseConfig = {
   projectId: "azul-cafe",
   storageBucket: "azul-cafe.firebasestorage.app",
   messagingSenderId: "923934050668",
-  appId: "1:923934050668:web:f66fcca742b7c99ae40b49"
+  appId: "1:923934050668:web:f66fcca742b7c99ae40b49",
+  databaseURL: "https://azul-cafe-default-rtdb.firebaseio.com"
 };
 
 // Initialize Firebase
@@ -29,5 +30,7 @@ const menuRef = db.ref('menu');
 
 // Export Firebase services to use in other scripts
 window.db = db;
+window.auth = auth;
+window.menuRef = menuRef;
 window.auth = auth;
 window.menuRef = menuRef;

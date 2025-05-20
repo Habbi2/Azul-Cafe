@@ -64,6 +64,7 @@ Firebase offers several advantages for this application:
    - In Firebase Console, go to Project Settings > Service Accounts
    - Click "Generate New Private Key"
    - Save the file as `serviceAccountKey.json` in the project root directory
+   - **IMPORTANT SECURITY NOTE**: This file contains sensitive credentials and should never be committed to Git repositories or made public. It has been added to `.gitignore` to prevent accidental commits.
 
 3. Run the import script:
    ```
