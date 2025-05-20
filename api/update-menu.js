@@ -1,6 +1,5 @@
 // For Vercel serverless functions
-const fs = require('fs');
-const path = require('path');
+import { updateMenuData } from './db.js';
 
 // Use environment variable if available, fallback to hardcoded value
 // In production, set this via Vercel environment variables
@@ -22,12 +21,12 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
-
   // Check for API key in headers
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ') || authHeader.replace('Bearer ', '') !== API_KEY) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
+  
   try {
     // Get the updated menu data from request body
     const menuData = req.body;
@@ -37,27 +36,14 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Datos de menú inválidos' });
     }
     
-    // In Vercel environment, we can't write to the filesystem
-    // Just return success to avoid errors in the UI
-    if (process.env.VERCEL) {
-      // Log the data that would have been saved (for debugging)
-      console.log('Would update menu data:', JSON.stringify(menuData, null, 2));
-      
-      // Return success response
-      return res.status(200).json({ 
-        success: true, 
-        message: 'Menú actualizado correctamente (nota: en producción, los cambios no se guardan permanentemente)' 
-      });
-    }
-    
-    // For local development, write to the file
-    const menuFilePath = path.join(process.cwd(), 'data', 'menu.json');
-    
-    // Write the updated menu to the file
-    fs.writeFileSync(menuFilePath, JSON.stringify(menuData, null, 2), 'utf8');
+    // Update the menu data using our database module
+    await updateMenuData(menuData);
     
     // Return success response
-    return res.status(200).json({ success: true, message: 'Menú actualizado correctamente' });
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Menú actualizado correctamente' 
+    });
   } catch (error) {
     console.error('Error updating menu:', error);
     return res.status(500).json({ error: 'Error al actualizar el menú' });

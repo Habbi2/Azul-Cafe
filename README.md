@@ -8,12 +8,14 @@ Un sitio web para mostrar el menú de Azul Café con un panel de administración
 - Panel de administración protegido con contraseña
 - Capacidad para editar precios, añadir y eliminar productos
 - Listo para desplegar en Vercel
+- Sistema de persistencia de datos para entornos serverless
 
 ## Configuración para Desarrollo Local
 
 1. Clona este repositorio
 2. Abre el proyecto en tu editor de código
 3. Para probar localmente, puedes usar un servidor local como Live Server (extensión de VS Code)
+4. Para probar el entorno Vercel, utiliza `vercel dev`
 
 ## Despliegue en Vercel
 
@@ -39,6 +41,27 @@ La aplicación utiliza funciones serverless para manejar la API:
 
 - **GET /api/get-menu**: Obtiene los datos del menú actual
 - **POST /api/update-menu**: Actualiza los datos del menú (requiere autenticación)
+- **POST /api/auth**: Autentica al administrador y devuelve un API key
+
+### Sistema de Base de Datos
+
+Para resolver el problema de persistencia de datos en entornos serverless como Vercel, esta aplicación implementa:
+
+1. **Simulación de base de datos (`db.js`)**: Maneja los datos del menú en memoria y sincronización con variables de entorno
+2. **Persistencia vía Variables de Entorno**: Almacena los datos del menú actualizados en variables de entorno
+3. **Sistema de Caché**: En caso de reinicio de función, recupera los datos desde la variable de entorno
+
+Este enfoque permite que los cambios en el menú persistan entre múltiples invocaciones de las funciones serverless, lo que tradicionalmente es un desafío en este tipo de arquitecturas.
+
+Para implementaciones de producción más robustas, considera usar:
+- Vercel KV (almacenamiento clave-valor basado en Redis)
+- MongoDB Atlas
+- Supabase o PostgreSQL
+
+#### Flujo de Datos:
+1. El panel de administración hace peticiones a `/api/update-menu` con los cambios
+2. La función actualiza los datos en memoria y los escribe en la variable de entorno
+3. Futuras peticiones a `/api/get-menu` recogerán estos datos persistentes
 
 La configuración de las funciones serverless está en el archivo `vercel.json`, que especifica:
 
@@ -96,12 +119,18 @@ Este proyecto está diseñado para demostración. En un entorno de producción, 
 
 ### Configuración de Variables de Entorno en Vercel
 
-Para mejorar la seguridad, deberías configurar las claves API y contraseñas como variables de entorno en Vercel:
+Para que los cambios en el menú persistan entre sesiones, **es obligatorio** configurar las siguientes variables de entorno en Vercel:
 
 1. En la consola de Vercel, ve a tu proyecto
 2. Navega a "Settings" > "Environment Variables"
-3. Añade tus variables de entorno (ejemplo: `API_KEY`, `ADMIN_PASSWORD`)
-4. Aplica las variables a los entornos de production, preview y development según sea necesario
+3. Añade estas variables:
+   - `API_KEY`: Clave para autenticar peticiones de actualización del menú (ej: `azulcafe-admin-123`)
+   - `ADMIN_PASSWORD`: Contraseña para el panel de administración (ej: `admin123`)
+   - `AZUL_CAFE_MENU_DATA`: (se creará automáticamente) Almacena los datos del menú
+   - `AZUL_CAFE_MENU_UPDATED_AT`: (se creará automáticamente) Marca de tiempo de la última actualización
+4. Aplica las variables a los entornos de Production, Preview y Development
+
+**Importante**: Después de realizar cambios en el menú a través del panel de administración, estos se almacenarán en la instancia actual de la función. Para hacer que estos cambios sean permanentes en todas las instancias, debes actualizar manualmente las variables de entorno en el panel de Vercel con los valores que aparecen en los logs de la función, o implementar una solución de base de datos más robusta como se sugiere en este documento.
 
 ## Pruebas de API
 
