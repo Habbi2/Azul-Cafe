@@ -1,7 +1,7 @@
 // API Test Script
 // Run this in a browser console or with Node.js to test the API endpoints
 
-const API_BASE_URL = 'https://your-project-name.vercel.app'; // Change this to your deployed URL
+const API_BASE_URL = 'https://azul-cafe.vercel.app/'; // Change this to your deployed URL
 // For local testing use:
 // const API_BASE_URL = 'http://localhost:3000'; 
 
