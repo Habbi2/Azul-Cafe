@@ -1,36 +1,19 @@
-// For Vercel serverless functions
+// API Test Script
+// Run this in a browser console or with Node.js to test the API endpoints
 
-export default async function handler(req, res) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
-  
-  // Handle OPTIONS request for CORS preflight
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  
+const API_BASE_URL = 'https://azul-cafe.vercel.app'; // Change this to your deployed URL (remove trailing slash)
+// For local testing use:
+// const API_BASE_URL = 'http://localhost:3000'; 
+
+async function testHealthEndpoint() {
   try {
-    // Return diagnostics information
-    return res.status(200).json({
-      message: 'API Test Endpoint',
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      environment: process.env.VERCEL ? 'vercel' : 'local',
-      nodeEnv: process.env.NODE_ENV || 'development',
-      endpoints: {
-        health: '/api/health',
-        getMenu: '/api/get-menu',
-        auth: '/api/auth',
-        updateMenu: '/api/update-menu'
-      },
-      note: 'For API testing, use the /api-test.html page or /js/api-test.js script'
-    });
+    const response = await fetch(`${API_BASE_URL}/api/health`);
+    const data = await response.json();
+    console.log('Health endpoint response:', data);
+    return data;
   } catch (error) {
-    console.error('Error in test endpoint:', error);
-    return res.status(500).json({ error: 'Internal Server Error', message: error.message });
+    console.error('Health endpoint error:', error);
+    return null;
   }
 }
 

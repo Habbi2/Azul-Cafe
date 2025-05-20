@@ -49,17 +49,29 @@
         .input-group {
             margin-bottom: 20px;
         }
+        .note {
+            background-color: #f8f9fa;
+            border-left: 4px solid #7596a8;
+            padding: 10px 15px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
     <h1>Azul Café - API Test</h1>
     
+    <div class="note">
+        <p><strong>Nota:</strong> Esta página te permite probar las API endpoints de Azul Café. También hay un script 
+        JavaScript disponible en <code>/js/api-test.js</code> para pruebas programáticas.</p>
+    </div>
+    
     <div class="input-group">
         <label for="api-url">API Base URL:</label>
         <input type="text" id="api-url" class="url-input" value="https://azul-cafe.vercel.app" />
     </div>
-    
-    <div>
+      <div>
+        <button onclick="testEndpoint()">Test Diagnostic Endpoint</button>
         <button onclick="testHealthEndpoint()">Test Health Endpoint</button>
         <button onclick="testGetMenuEndpoint()">Test Get Menu</button>
         <button onclick="testAuthEndpoint()">Test Auth</button>
@@ -68,8 +80,7 @@
     
     <h2>Results:</h2>
     <div id="results"></div>
-    
-    <script>
+      <script>
         const resultsElement = document.getElementById('results');
         
         function getAPIBaseURL() {
@@ -102,6 +113,22 @@
         
         function clearResults() {
             resultsElement.innerHTML = '';
+        }
+        
+        async function testEndpoint() {
+            try {
+                const API_BASE_URL = getAPIBaseURL();
+                const response = await fetch(`${API_BASE_URL}/api/test`);
+                
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                displayResult('Diagnostic Endpoint', data);
+            } catch (error) {
+                displayError('Diagnostic Endpoint', error);
+            }
         }
         
         async function testHealthEndpoint() {

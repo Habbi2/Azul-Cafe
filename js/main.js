@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
 async function fetchMenu() {
     try {
         // Use the serverless function to get the menu data
-        const response = await fetch('/api/get-menu');
+        const response = await fetch('/api/get-menu.js');
         if (!response.ok) {
             throw new Error('No se pudo cargar el menú');
         }

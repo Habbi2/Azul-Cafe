@@ -105,11 +105,16 @@ Para mejorar la seguridad, deberías configurar las claves API y contraseñas co
 
 ## Pruebas de API
 
-Para probar las funciones serverless, puedes utilizar el script de prueba incluido:
+Para probar las funciones serverless, puedes utilizar las herramientas incluidas:
 
-1. Después de desplegar en Vercel, abre `api/test.js`
-2. Actualiza `API_BASE_URL` con la URL de tu proyecto desplegado
-3. Ejecuta el script en un navegador o usando Node.js
+1. **Usando la página de prueba en el navegador**:
+   - Después de desplegar en Vercel, abre `https://tu-proyecto.vercel.app/api-test.html`
+   - Utiliza los botones para probar diferentes endpoints
+
+2. **Usando el script de API Test**:
+   - El script está disponible en `js/api-test.js`
+   - Actualiza `API_BASE_URL` con la URL de tu proyecto desplegado
+   - Ejecuta el script en un navegador o usando Node.js
 
 ```javascript
 // Ejecutar todas las pruebas
@@ -124,6 +129,13 @@ testAuthEndpoint('admin123').then(result => {
   }
 });
 ```
+
+3. **Endpoints disponibles para pruebas**:
+   - `/api/health` - Para verificar que la API esté funcionando
+   - `/api/get-menu` - Para obtener datos del menú
+   - `/api/test` - Obtener información de diagnóstico
+   - `/api/auth` - Autenticación (POST)
+   - `/api/update-menu` - Actualizar menú (POST, requiere autenticación)
 
 ## Contacto
 
