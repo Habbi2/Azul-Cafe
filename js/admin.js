@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Send the updated menu data to the serverless function
-            const response = await fetch('/api/update-menu', {
+            const response = await fetch('/api/update-menu.js', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
